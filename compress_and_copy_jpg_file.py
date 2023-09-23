@@ -42,6 +42,9 @@ def process_file(file_info):
 def main(input_dir, output_dir, target_size):
     files_to_process = []
 
+    os.makedirs(input_dir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
+    
     # 遍历输入目录下的所有文件和子目录
     for root, _, files in os.walk(input_dir):
         for file in files:
