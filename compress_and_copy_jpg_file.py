@@ -1,3 +1,5 @@
+import sys
+
 from PIL import Image
 import os
 import shutil
@@ -44,7 +46,7 @@ def main(input_dir, output_dir, target_size):
 
     os.makedirs(input_dir, exist_ok=True)
     os.makedirs(output_dir, exist_ok=True)
-    
+
     # 遍历输入目录下的所有文件和子目录
     for root, _, files in os.walk(input_dir):
         for file in files:
@@ -65,10 +67,32 @@ def main(input_dir, output_dir, target_size):
 
 
 if __name__ == "__main__":
+
+    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
+
     '''todo'''
     input_dir = "input_directory"  # 输入目录的路径
     output_dir = "output_directory"  # 输出目录的路径
     # 目标大小 1024 * 1024 = 1MB
     target_size = 1024 * 1524
     ''''''''''''''''''
-    main(input_dir, output_dir, target_size)
+    # main(input_dir, output_dir, target_size)
+    files_to_process = []
+
+    os.makedirs(input_dir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
+
+    # 遍历输入目录下的所有文件和子目录
+    for root, _, files in os.walk(input_dir):
+        for file in files:
+            # 检查文件扩展名是否为.jpg
+            if file.lower().endswith('.jpg'):
+                input_file_path = os.path.join(root, file)
+                # 构建输出文件路径，保留相对目录结构
+                relative_path = os.path.relpath(input_file_path, input_dir)
+                output_file_path = os.path.join(output_dir, relative_path)
+                files_to_process.append((input_file_path, output_file_path, target_size))
+    pool.map(process_file, files_to_process)
+    pool.close()
+    pool.join()
+    sys.exit()
